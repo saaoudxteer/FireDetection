@@ -1,9 +1,0 @@
-# Environnement virtuel
-FireDetection-env/
-
-# Caches Python
-__pycache__/
-*.py[cod]
-
-# Fichiers temporaires
-*~
