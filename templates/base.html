@@ -1,10 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
-<style>
-body{background:#0f172a !important;}
-</style>
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -12,30 +8,26 @@ body{background:#0f172a !important;}
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
- <link href="{% static 'css/style.css' %}" rel="stylesheet">
-
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  <style>body { background: #0f172a !important; }</style>
 </head>
 <body>
 
-  <!-- ── Barre latérale ─────────────────────────────────────────── -->
+  <!-- Sidebar -->
   <aside>
-    <div class="brand"><i class="fas fa-fire"></i> FireDetection</div>
-
+    <div class="brand"><i class="fas fa-fire"></i> SAAOUDIDetection</div>
     <nav>
-      <a href="{% url 'home' %}"
-         class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+      <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
         <i class="fas fa-house"></i> Accueil
       </a>
-      <a href="{% url 'upload' %}"
-         class="nav-link {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
+      <a href="{% url 'upload' %}" class="nav-link {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
         <i class="fas fa-cloud-upload-alt"></i> Tester
       </a>
     </nav>
-
     <div class="sidebar-foot">&copy; {{ year }} FireDetection</div>
   </aside>
 
-  <!-- ── Zone principale ────────────────────────────────────────── -->
+  <!-- Main content -->
   <main>
     <div class="topbar">{% block topbar %}{% endblock %}</div>
     <div class="content">{% block content %}{% endblock %}</div>

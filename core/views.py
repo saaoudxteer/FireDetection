@@ -1,61 +1,76 @@
-import os
-from datetime import datetime
+# core/views.py
 
+from pathlib import Path
+from django.shortcuts import render
 from django.conf import settings
-from django.shortcuts import render, redirect
 
-from .forms import UploadForm
-
+from .forms import DetectionForm
+from .model import compute_danger_score, compute_danger_level, DANGER_LABELS
+from .predictors import (
+    predict_fire,
+    predict_smoke,
+    predict_uncontrolled,
+    predict_forest,
+    predict_person,
+)
 
 def home(request):
-    return render(request, 'home.html', {
-        'year': datetime.now().year
-    })
+    """Page d'accueil."""
+    return render(request, "home.html")
+
+
+def handle_upload(f):
+    """Enregistre le fichier uploadé et renvoie son chemin sur le disque."""
+    upload_dir = Path(settings.MEDIA_ROOT) / "uploads"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    dest = upload_dir / f.name
+    with open(dest, "wb") as out:
+        for chunk in f.chunks():
+            out.write(chunk)
+    return dest
 
 
 def upload(request):
     """
-    Affiche le formulaire et, en POST, sauvegarde le fichier,
-    lance le modèle (simulé ici) et renvoie le résultat.
+    Page d'upload et d'affichage des résultats (features.html).
+    Utilise DetectionForm pour n'accepter que des images.
     """
-    result = None
-    form = UploadForm(request.POST or None, request.FILES or None)
+    # Initialisation du contexte avec un formulaire vide
+    context = {"form": DetectionForm()}
 
-    if request.method == 'POST' and form.is_valid():
-        f = form.cleaned_data['file']
-        # Crée le dossier media s’il n’existe pas
-        os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
-        save_path = settings.MEDIA_ROOT / f.name
+    if request.method == "POST":
+        form = DetectionForm(request.POST, request.FILES)
+        if form.is_valid():
+            # 1) Sauvegarde de l'image
+            img_file = form.cleaned_data["image"]
+            img_path = handle_upload(img_file)
 
-        # Sauvegarde du fichier
-        with open(save_path, 'wb+') as dest:
-            for chunk in f.chunks():
-                dest.write(chunk)
+            # 2) Prédictions
+            fire_val         = predict_fire(img_path)
+            smoke_val        = predict_smoke(img_path)
+            uncontrolled_val = predict_uncontrolled(img_path)
+            forest_val       = predict_forest(img_path)
+            person_val       = predict_person(img_path)
 
-        # TODO : remplacer cette simulation par ton véritable appel au modèle
-        result = {
-            'is_fire': True,                  # True si feu détecté
-            'confidence': 92.3,               # % de confiance
-            'file_type': f.name.split('.')[-1],
-            'processing_time': 0.95,          # en secondes
-        }
+            # 3) Score global et niveau
+            score = compute_danger_score(
+                fire_val, smoke_val, person_val, uncontrolled_val, forest_val
+            )
+            level = compute_danger_level(score)
 
-    return render(request, 'features.html', {
-        'form': form,
-        'result': result,
-        'year': datetime.now().year
-    })
+            # 4) Mise à jour du contexte avec les résultats
+            context.update({
+                "original_url": settings.MEDIA_URL + "uploads/" + img_file.name,
+                "fire_confidence": round(fire_val, 2),
+                "smoke_confidence": round(smoke_val, 2),
+                "uncontrolled_confidence": round(uncontrolled_val, 2),
+                "environment_confidence": round(forest_val, 2),
+                "person_detected": bool(person_val),
+                "danger_score": round(score, 2),
+                "danger_label": DANGER_LABELS[level],
+            })
+        else:
+            # Formulaire invalide : on renvoie juste le form pour afficher les erreurs
+            context = {"form": form}
 
-
-def result(request, filename):
-    """
-    Vue complémentaire si tu souhaites conserver une page séparée
-    de ‘result’. Sinon, tu peux l’enlever et tout gérer dans upload().
-    """
-    return render(request, 'result.html', {
-        'filename': filename,
-        'file_url': settings.MEDIA_URL + filename,
-        'year': datetime.now().year
-    })
-
-
+    return render(request, "features.html", context)

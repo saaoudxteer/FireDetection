@@ -1,40 +1,54 @@
 {% extends "base.html" %}
-{% block title %}Tester | FireDetection{% endblock %}
-
 {% block content %}
-  <h2 style="font-size:1.5rem;margin-bottom:1rem">Analyser un média</h2>
 
-  <form method="post" enctype="multipart/form-data" class="card" style="max-width:480px">
-    {% csrf_token %}
-    {{ form.file }}
-    <p style="font-size:.8rem;color:var(--text-sub);margin-top:.5rem">
-      Formats : JPG • PNG • MP4 (max 5 Mo)
-    </p>
-    <button type="submit" class="btn" style="margin-top:1rem">
-      <i class="fas fa-search"></i> Lancer l’analyse
-    </button>
-  </form>
+<h1 class="text-3xl mb-6">Test de détection</h1>
 
-  {% if result %}
-  <section class="card" style="max-width:480px;margin-top:2rem">
-    {% if result.is_fire %}
-      <p class="alert-ko"><i class="fas fa-fire"></i> Feu détecté</p>
-    {% else %}
-      <p class="alert-ok"><i class="fas fa-check-circle"></i> Aucun foyer détecté</p>
-    {% endif %}
+<form method="post" enctype="multipart/form-data" class="mb-8">
+  {% csrf_token %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {{ form.as_p }}
+  </div>
+  <button type="submit" class="btn mt-4">Analyser l’image</button>
+</form>
 
-    <div class="grid2" style="margin-top:1rem">
-      <div><strong>Confiance :</strong> {{ result.confidence|floatformat:1 }} %</div>
-      <div><strong>Durée :</strong> {{ result.processing_time }} s</div>
-      <div><strong>Type :</strong> {{ result.file_type|upper }}</div>
-      <div><strong>Modèle :</strong> FireNet v4.1</div>
+{# Résultats : n’apparaît que si original_url est fourni #}
+{% if original_url %}
+  <div class="card p-6 bg-glass rounded max-w-2xl mx-auto">
+    <h2 class="text-2xl mb-4">Résultats</h2>
+
+    <img src="{{ original_url }}"
+     alt="Image analysée"
+     style="max-width:400px;width:100%;height:auto;object-fit:contain"
+     class="mb-6 rounded shadow-lg" />
+
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="p-4 bg-white/20 rounded">
+        <h3 class="font-semibold">Incendie</h3>
+        <p>{{ fire_confidence }}</p>
+      </div>
+      <div class="p-4 bg-white/20 rounded">
+        <h3 class="font-semibold">Fumée</h3>
+        <p>{{ smoke_confidence }}</p>
+      </div>
+      <div class="p-4 bg-white/20 rounded">
+        <h3 class="font-semibold">Incontrôlé</h3>
+        <p>{{ uncontrolled_confidence }}</p>
+      </div>
+      <div class="p-4 bg-white/20 rounded">
+        <h3 class="font-semibold">Environnement</h3>
+        <p>{{ environment_confidence }}</p>
+      </div>
+      <div class="p-4 bg-white/20 rounded col-span-2">
+        <h3 class="font-semibold">Personne</h3>
+        <p>{% if person_detected %}Présente{% else %}Absente{% endif %}</p>
+      </div>
     </div>
 
-    {% if result.is_fire %}
-      <a href="{% url 'result' filename=result.filename %}" class="btn" style="margin-top:1rem;width:100%;justify-content:center">
-        Rapport détaillé
-      </a>
-    {% endif %}
-  </section>
-  {% endif %}
+    <div class="p-4 bg-accent text-white rounded">
+      <p class="text-lg">Score de danger : {{ danger_score }}</p>
+      <p class="text-lg">Niveau : {{ danger_label }}</p>
+    </div>
+  </div>
+{% endif %}
+
 {% endblock %}

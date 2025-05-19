@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Accueil | FireDetection{% endblock %}
-
 {% block content %}
-  <section class="card" style="max-width:600px;margin:auto;text-align:center">
-    <h1 style="font-size:2rem;margin-bottom:1rem">IA de détection d’incendie</h1>
-    <p style="color:var(--text-sub);margin-bottom:1.5rem">
-      Analysez vos images et vidéos en quelques secondes : repérez instantanément tout départ de feu.
-    </p>
-    <a href="{% url 'upload' %}" class="btn"><i class="fas fa-rocket"></i> Tester maintenant</a>
-  </section>
+<section class="card" style="max-width:600px;margin:auto;text-align:center">
+  <h1 style="font-size:2rem;margin-bottom:1rem">IA de détection d’incendie</h1>
+  <p style="color:var(--text-sub);margin-bottom:1.5rem">
+    Analysez vos images en quelques secondes : repérez instantanément tout départ de feu.
+  </p>
+  <a href="{% url 'upload' %}" class="btn"><i class="fas fa-rocket"></i> Tester maintenant</a>
+</section>
 {% endblock %}
