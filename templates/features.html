@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Tester | FireDetection{% endblock %}
+
+{% block content %}
+  <h2 style="font-size:1.5rem;margin-bottom:1rem">Analyser un média</h2>
+
+  <form method="post" enctype="multipart/form-data" class="card" style="max-width:480px">
+    {% csrf_token %}
+    {{ form.file }}
+    <p style="font-size:.8rem;color:var(--text-sub);margin-top:.5rem">
+      Formats : JPG • PNG • MP4 (max 5 Mo)
+    </p>
+    <button type="submit" class="btn" style="margin-top:1rem">
+      <i class="fas fa-search"></i> Lancer l’analyse
+    </button>
+  </form>
+
+  {% if result %}
+  <section class="card" style="max-width:480px;margin-top:2rem">
+    {% if result.is_fire %}
+      <p class="alert-ko"><i class="fas fa-fire"></i> Feu détecté</p>
+    {% else %}
+      <p class="alert-ok"><i class="fas fa-check-circle"></i> Aucun foyer détecté</p>
+    {% endif %}
+
+    <div class="grid2" style="margin-top:1rem">
+      <div><strong>Confiance :</strong> {{ result.confidence|floatformat:1 }} %</div>
+      <div><strong>Durée :</strong> {{ result.processing_time }} s</div>
+      <div><strong>Type :</strong> {{ result.file_type|upper }}</div>
+      <div><strong>Modèle :</strong> FireNet v4.1</div>
+    </div>
+
+    {% if result.is_fire %}
+      <a href="{% url 'result' filename=result.filename %}" class="btn" style="margin-top:1rem;width:100%;justify-content:center">
+        Rapport détaillé
+      </a>
+    {% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

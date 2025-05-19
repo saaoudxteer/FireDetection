@@ -1,23 +1,45 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
+<style>
+body{background:#0f172a !important;}
+</style>
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}FireDetection{% endblock %}</title>
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}FireDetection{% endblock %}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+ <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Accueil</a>
-        </nav>
-    </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-    <footer>
-        &copy; {{ year }} FireDetection
-    </footer>
+
+  <!-- ── Barre latérale ─────────────────────────────────────────── -->
+  <aside>
+    <div class="brand"><i class="fas fa-fire"></i> FireDetection</div>
+
+    <nav>
+      <a href="{% url 'home' %}"
+         class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+        <i class="fas fa-house"></i> Accueil
+      </a>
+      <a href="{% url 'upload' %}"
+         class="nav-link {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
+        <i class="fas fa-cloud-upload-alt"></i> Tester
+      </a>
+    </nav>
+
+    <div class="sidebar-foot">&copy; {{ year }} FireDetection</div>
+  </aside>
+
+  <!-- ── Zone principale ────────────────────────────────────────── -->
+  <main>
+    <div class="topbar">{% block topbar %}{% endblock %}</div>
+    <div class="content">{% block content %}{% endblock %}</div>
+  </main>
+
 </body>
 </html>
