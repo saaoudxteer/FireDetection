@@ -13,7 +13,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 # … autres imports …
+from dotenv import load_dotenv
 
+# charger .env
+project_root = Path(__file__).resolve().parent.parent
+load_dotenv(project_root / ".env")
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Dossier non suivi contenant les poids de modèles
