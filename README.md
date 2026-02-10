@@ -1,8 +1,4 @@
-Here is a professional, portfolio-ready **README** in English. It strips away the "student project" vibe and focuses on the engineering challenges (computer vision fusion, context-awareness, and Django integration).
 
-You can copy-paste this directly into your GitHub repository.
-
----
 
 # 🔥 SmartFire AI: Context-Aware Fire Danger Assessment
 
